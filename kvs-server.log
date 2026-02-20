@@ -1,0 +1,65 @@
+Feb 19 14:07:27.591 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 14:33:30.822 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 14:33:30.822 INFO Listening to connections, version: 1
+Feb 19 14:34:58.476 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 14:34:58.476 INFO Listening to connections, version: 1
+Feb 19 14:39:35.040 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 14:39:35.040 INFO Listening to connections, version: 1
+Feb 19 14:40:02.753 INFO Client connected, client_addr: 127.0.0.1:63835, version: 1
+Feb 19 16:44:48.080 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 16:44:48.080 INFO Listening to connections, version: 1
+Feb 19 16:44:58.006 INFO Client connected, client_addr: 127.0.0.1:59173, version: 1
+Feb 19 17:28:14.765 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 17:28:14.765 INFO Listening to connections, version: 1
+Feb 19 17:28:19.972 INFO Client connected, client_addr: 127.0.0.1:62897, version: 1
+Feb 19 17:29:55.537 INFO Client connected, client_addr: 127.0.0.1:63027, version: 1
+Feb 19 17:32:42.960 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 17:32:42.960 INFO Listening to connections, version: 1
+Feb 19 17:32:47.499 INFO Client connected, client_addr: 127.0.0.1:63427, version: 1
+Feb 19 17:32:47.499 INFO received request, req: Get("val"), version: 1
+Feb 19 17:32:47.499 INFO Client disconnected, client_addr: 127.0.0.1:63427, version: 1
+Feb 19 18:07:02.433 INFO Server configuration, engine: kvs, addr: 127.0.0.1:4000, version: 1
+Feb 19 18:07:02.434 INFO Listening to connections, version: 1
+Feb 19 18:07:07.532 INFO Client connected, client_addr: 127.0.0.1:50063, version: 1
+Feb 19 18:07:07.532 INFO Received request, req: Get("val"), version: 1
+Feb 19 18:07:07.532 INFO Client disconnected, client_addr: 127.0.0.1:50063, version: 1
+Feb 19 18:07:22.808 INFO Client connected, client_addr: 127.0.0.1:50111, version: 1
+Feb 19 18:07:22.808 INFO Received request, req: Set("k1", "v1"), version: 1
+Feb 19 18:07:22.809 INFO Client disconnected, client_addr: 127.0.0.1:50111, version: 1
+Feb 19 18:07:32.663 INFO Client connected, client_addr: 127.0.0.1:50116, version: 1
+Feb 19 18:07:32.663 INFO Received request, req: Get("k1"), version: 1
+Feb 19 18:07:32.664 INFO Client disconnected, client_addr: 127.0.0.1:50116, version: 1
+Feb 20 15:16:25.364 INFO Storage engine, engine: kvs, version: 1
+Feb 20 15:16:25.364 INFO Listening on, addr: 127.0.0.1:4000, version: 1
+Feb 20 15:16:25.365 INFO Listening to connections, version: 1
+Feb 20 15:16:31.193 INFO Client connected, client_addr: 127.0.0.1:61752, version: 1
+Feb 20 15:16:31.193 INFO Received request, from: 127.0.0.1:61752, req: Get("k1"), version: 1
+Feb 20 15:16:31.194 DEBG Response sent, to: 127.0.0.1:61752, resp: Ok(Some("v1")), version: 1
+Feb 20 15:19:01.214 INFO Storage engine, engine: kvs, version: 1
+Feb 20 15:19:01.214 INFO Listening on, addr: 127.0.0.1:4000, version: 1
+Feb 20 15:19:01.214 INFO Listening to connections, version: 1
+Feb 20 15:19:03.627 INFO Client connected, client_addr: 127.0.0.1:61839, version: 1
+Feb 20 15:19:03.627 INFO Received request, from: 127.0.0.1:61839, req: Get("k1"), version: 1
+Feb 20 15:19:03.627 DEBG Response sent, to: 127.0.0.1:61839, resp: Ok(Some("v1")), version: 1
+Feb 20 15:19:03.628 ERRO Failed to receive message, from: 127.0.0.1:61839, err: Io(Error { kind: UnexpectedEof, message: "failed to fill whole buffer" }), version: 1
+Feb 20 15:19:09.243 INFO Client connected, client_addr: 127.0.0.1:61840, version: 1
+Feb 20 15:19:09.243 INFO Received request, from: 127.0.0.1:61840, req: Get("k1"), version: 1
+Feb 20 15:19:09.243 DEBG Response sent, to: 127.0.0.1:61840, resp: Ok(Some("v1")), version: 1
+Feb 20 15:19:09.243 ERRO Failed to receive message, from: 127.0.0.1:61840, err: Io(Error { kind: UnexpectedEof, message: "failed to fill whole buffer" }), version: 1
+Feb 20 15:19:21.207 INFO Client connected, client_addr: 127.0.0.1:61859, version: 1
+Feb 20 15:19:21.207 INFO Received request, from: 127.0.0.1:61859, req: Rm("k2"), version: 1
+Feb 20 15:19:21.207 DEBG Response sent, to: 127.0.0.1:61859, resp: Err("Key not found"), version: 1
+Feb 20 15:19:21.208 ERRO Failed to receive message, from: 127.0.0.1:61859, err: Io(Error { kind: UnexpectedEof, message: "failed to fill whole buffer" }), version: 1
+Feb 20 15:23:04.993 INFO Storage engine, engine: kvs, version: 1
+Feb 20 15:23:04.993 INFO Listening on, addr: 127.0.0.1:4000, version: 1
+Feb 20 15:23:04.993 INFO Listening to connections, version: 1
+Feb 20 15:23:11.135 INFO Client connected, client_addr: 127.0.0.1:61986, version: 1
+Feb 20 15:23:11.135 INFO Received request, from: 127.0.0.1:61986, req: Get("k1"), version: 1
+Feb 20 15:23:11.135 DEBG Response sent, to: 127.0.0.1:61986, resp: Ok(Some("v1")), version: 1
+Feb 20 15:23:11.136 INFO Client disconnected, client_addr: 127.0.0.1:61986, version: 1
+Feb 20 17:08:33.061 INFO Storage engine, engine: kvs, version: 1
+Feb 20 17:08:33.061 INFO Listening on, addr: 127.0.0.1:4004, version: 1
+Feb 20 17:08:33.061 INFO Listening to connections, version: 1
+Feb 20 17:09:29.676 INFO Storage engine, engine: kvs, version: 1
+Feb 20 17:09:29.676 INFO Listening on, addr: 127.0.0.1:4004, version: 1
+Feb 20 17:09:29.676 INFO Listening to connections, version: 1
