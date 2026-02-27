@@ -73,8 +73,8 @@ fn read(c: &mut Criterion) {
                 // Write 100 random key-value pairs
                 let keys: Vec<String> = (0..100)
                     .map(|_| {
-                        let key_len = rng.gen_range(1, 100001);
-                        let val_len = rng.gen_range(1, 100001);
+                        let key_len = rng.gen_range(1, 1001);
+                        let val_len = rng.gen_range(1, 1001);
                         let key = random_string(&mut rng, key_len);
                         let value = random_string(&mut rng, val_len);
                         store.set(key.clone(), value).unwrap();
@@ -106,8 +106,8 @@ fn read(c: &mut Criterion) {
                 // Write 100 random key-value pairs
                 let keys: Vec<String> = (0..100)
                     .map(|_| {
-                        let key_len = rng.gen_range(1, 100001);
-                        let val_len = rng.gen_range(1, 100001);
+                        let key_len = rng.gen_range(1, 1001);
+                        let val_len = rng.gen_range(1, 1001);
                         let key = random_string(&mut rng, key_len);
                         let value = random_string(&mut rng, val_len);
                         db.set(key.clone(), value).unwrap();
