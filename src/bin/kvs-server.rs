@@ -4,7 +4,7 @@ use std::{
 use clap::Parser;
 use slog::{o, Drain, Logger};
 
-use kvs::{engine::{engine::KvsEngine, kvs::KvStore, sled::SledKvsEngine}, error::Result, server::KvServer};
+use kvs::{engine::{KvsEngine, kvs::KvStore, sled::SledKvsEngine}, error::Result, server::KvServer};
 
 
 #[derive(Parser)]

@@ -4,7 +4,7 @@ use std::{
 };
 
 use crate::{
-    engine::engine::KvsEngine,
+    engine::KvsEngine,
     error::{KvsError, Result},
     proto::{GetResponse, RemoveResponse, Request, SetResponse, recv_message, send_message}
 };

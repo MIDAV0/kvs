@@ -1,5 +1,5 @@
 pub use client::KvClient;
-pub use engine::{kvs::KvStore, engine::KvsEngine, sled::SledKvsEngine};
+pub use engine::{kvs::KvStore, KvsEngine, sled::SledKvsEngine};
 pub use error::{KvsError, Result};
 pub use server::KvServer;
 
@@ -8,3 +8,4 @@ pub mod server;
 pub mod client;
 pub mod engine;
 pub mod proto;
+pub mod thread_pool;

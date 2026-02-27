@@ -1,4 +1,4 @@
-use super::engine::KvsEngine;
+use super::KvsEngine;
 use crate::error::{KvsError, Result};
 use sled::{Db, Tree};
 

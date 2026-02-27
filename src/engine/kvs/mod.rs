@@ -10,7 +10,9 @@ use std::{
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
-use crate::{error::{KvsError,Result}, engine::engine::KvsEngine};
+use crate::error::{KvsError,Result};
+use super::KvsEngine;
+
 
 use buffer::{BufReaderWithPos, BufWriterWithPos};
 
