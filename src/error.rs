@@ -31,6 +31,9 @@ pub enum KvsError {
     /// Eof
     #[fail(display = "EOF")]
     EOF,
+    /// ThreadPool
+    #[fail(display = "threadpool error: {}", _0)]
+    ThreadPool(String),
 }
 
 impl From<io::Error> for KvsError {

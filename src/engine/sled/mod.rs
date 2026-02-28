@@ -14,14 +14,14 @@ impl SledKvsEngine {
 }
 
 impl KvsEngine for SledKvsEngine {
-    fn set(&mut self, key: String, value: String) -> Result<()> {
+    fn set(&self, key: String, value: String) -> Result<()> {
         let tree: &Tree = &self.0;
         tree.insert(key, value.into_bytes()).map(|_| ())?;
         tree.flush()?;
         Ok(())
     }
 
-    fn get(&mut self, key: String) -> Result<Option<String>> {
+    fn get(&self, key: String) -> Result<Option<String>> {
         let tree: &Tree = &self.0;
         Ok(tree
             .get(key)?
@@ -31,7 +31,7 @@ impl KvsEngine for SledKvsEngine {
             .map_err(|e| KvsError::Io(std::io::Error::new(std::io::ErrorKind::InvalidData, e)))?)
     }
 
-    fn remove(&mut self, key: String) -> Result<()> {
+    fn remove(&self, key: String) -> Result<()> {
         let tree: &Tree = &self.0;
         tree.remove(key)?.ok_or(KvsError::KeyNotFound)?;
         tree.flush()?;

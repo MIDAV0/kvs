@@ -6,7 +6,7 @@ use std::{
     fs::{self, File, OpenOptions},
     io::{self, Read, Seek, SeekFrom, Write},
     ops::Range,
-    path::{Path, PathBuf}
+    path::{Path, PathBuf}, sync::{Arc, Mutex}
 };
 use serde::{Deserialize, Serialize};
 use serde_json::Deserializer;
@@ -48,7 +48,12 @@ impl From<(u64, Range<u64>)> for CommandPos {
     }
 }
 
+#[derive(Clone)]
 pub struct KvStore {
+    store: Arc<Mutex<SharedKvStore>>
+}
+
+pub struct SharedKvStore {
     // log directory
     path: PathBuf,
     // map epoch number to the file reader
@@ -83,68 +88,42 @@ impl KvStore {
 
         let current_epoch = epoch_list.last().unwrap_or(&0) + 1;
         let writer = new_log_file(&path, current_epoch, &mut readers)?;
-        
-        Ok(KvStore {
-            path,
-            readers,
-            writer,
-            current_epoch,
-            index,
-            uncompacted
-        })
-    }
 
-    /// Clears stale entries in the log.
-    pub fn compact(&mut self) -> Result<()> {
-        // increase current gen by 2. current_gen + 1 is for the compaction file.
-        let compaction_epoch = self.current_epoch + 1;
-        self.current_epoch += 2;
-        self.writer = self.new_log_file(self.current_epoch)?;
-
-        let mut compaction_writer = self.new_log_file(compaction_epoch)?;
-
-        let mut new_pos = 0; // pos in the new log file.
-        for cmd_pos in &mut self.index.values_mut() {
-            let reader = self
-                .readers
-                .get_mut(&cmd_pos.epoch)
-                .ok_or(KvsError::ReaderNotFound)?;
-            if reader.pos != cmd_pos.pos {
-                reader.seek(SeekFrom::Start(cmd_pos.pos))?;
+        let store = Arc::new(Mutex::new(
+            SharedKvStore {
+                path,
+                readers,
+                writer,
+                current_epoch,
+                index,
+                uncompacted
             }
-
-            let mut entry_reader = reader.take(cmd_pos.len);
-            let len = io::copy(&mut entry_reader, &mut compaction_writer)?;
-            *cmd_pos = (compaction_epoch, new_pos..new_pos + len).into();
-            new_pos += len;
-        }
-        compaction_writer.flush()?;
-
-        // remove stale log files.
-        let stale_epochs: Vec<_> = self
-            .readers
-            .keys()
-            .filter(|&&epoch| epoch < compaction_epoch)
-            .cloned()
-            .collect();
-        for stale_epoch in stale_epochs {
-            self.readers.remove(&stale_epoch);
-            fs::remove_file(log_path(&self.path, stale_epoch))?;
-        }
-        self.uncompacted = 0;
-
-        Ok(())
+        ));
+        
+        Ok(KvStore { store })
     }
-
-    fn new_log_file(&mut self, epoch: u64) -> Result<BufWriterWithPos<File>> {
-        new_log_file(&self.path, epoch, &mut self.readers)
-    }
-
     
 }
 
 
 impl KvsEngine for KvStore {
+    fn set(&self, key: String, value: String) -> Result<()> {
+        self.store
+            .lock().unwrap().set(key, value)
+    }
+
+    fn get(&self, key: String) -> Result<Option<String>> {
+        self.store
+            .lock().unwrap().get(key)
+    }
+
+    fn remove(&self, key: String) -> Result<()> {
+        self.store
+            .lock().unwrap().remove(key)
+    }
+}
+
+impl SharedKvStore {
     fn set(&mut self, key: String, value: String) -> Result<()> {
         let cmd = Command::set(key.clone(), value);
         let pos = self.writer.pos;
@@ -187,6 +166,53 @@ impl KvsEngine for KvStore {
         } else {
             Err(KvsError::KeyNotFound)            
         }
+    }
+
+
+    /// Clears stale entries in the log.
+    fn compact(&mut self) -> Result<()> {
+        // increase current gen by 2. current_gen + 1 is for the compaction file.
+        let compaction_epoch = self.current_epoch + 1;
+        self.current_epoch += 2;
+        self.writer = self.new_log_file(self.current_epoch)?;
+
+        let mut compaction_writer = self.new_log_file(compaction_epoch)?;
+
+        let mut new_pos = 0; // pos in the new log file.
+        for cmd_pos in &mut self.index.values_mut() {
+            let reader = self
+                .readers
+                .get_mut(&cmd_pos.epoch)
+                .ok_or(KvsError::ReaderNotFound)?;
+            if reader.pos != cmd_pos.pos {
+                reader.seek(SeekFrom::Start(cmd_pos.pos))?;
+            }
+
+            let mut entry_reader = reader.take(cmd_pos.len);
+            let len = io::copy(&mut entry_reader, &mut compaction_writer)?;
+            *cmd_pos = (compaction_epoch, new_pos..new_pos + len).into();
+            new_pos += len;
+        }
+        compaction_writer.flush()?;
+
+        // remove stale log files.
+        let stale_epochs: Vec<_> = self
+            .readers
+            .keys()
+            .filter(|&&epoch| epoch < compaction_epoch)
+            .cloned()
+            .collect();
+        for stale_epoch in stale_epochs {
+            self.readers.remove(&stale_epoch);
+            fs::remove_file(log_path(&self.path, stale_epoch))?;
+        }
+        self.uncompacted = 0;
+
+        Ok(())
+    }
+
+    fn new_log_file(&mut self, epoch: u64) -> Result<BufWriterWithPos<File>> {
+        new_log_file(&self.path, epoch, &mut self.readers)
     }
 
 }
