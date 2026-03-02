@@ -1,5 +1,5 @@
 use crossbeam::channel::{Receiver, Sender, unbounded};
-use std::thread::{self, JoinHandle};
+use std::{panic, thread::{self, JoinHandle}};
 
 use crate::{Result, KvsError};
 use super::{ThreadPool, Job};
@@ -19,7 +19,6 @@ impl Worker {
                     job();
                 }
                 Err(e) => {
-
                     break;
                 }
             }
@@ -62,7 +61,9 @@ impl Drop for NaiveThreadPool {
         drop(self.sender.take());
         for worker in &mut self.workers {
             if let Some(thread) = worker.thread.take() {
-                thread.join().unwrap();
+                if let Err(e) = thread.join() {
+                    slog::error!(slog_scope::logger(), "Failed to join worker thread"; "worker_id" => worker.id, "error" => format!("{:?}", e));
+                }
             }
         }
     }
