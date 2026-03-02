@@ -25,11 +25,15 @@ fn create_logger() -> Logger {
     let stderr_decorator = slog_term::PlainSyncDecorator::new(std::io::stderr());
     let stderr_drain = slog_term::CompactFormat::new(stderr_decorator).build().fuse();
 
+    if !current_dir().unwrap().join("server-logs").exists() {
+        fs::create_dir(current_dir().unwrap().join("server-logs")).unwrap();
+    }
+
     let log_file = OpenOptions::new()
         .create(true)
         .write(true)
         .append(true)
-        .open("server-logs/kvs-server.log")
+        .open(current_dir().unwrap().join("server-logs").join("kvs-server.log"))
         .unwrap();
     let file_decorator = slog_term::PlainDecorator::new(log_file);
     let file_drain = slog_term::FullFormat::new(file_decorator).build().fuse();
@@ -66,6 +70,10 @@ fn run(cli: Cli) -> Result<()> {
     slog::info!(slog_scope::logger(), "Storage engine"; "engine" => &cli.engine);    slog::info!(slog_scope::logger(), "Listening on"; "addr" => &cli.addr);
 
     let data_file = current_dir()?.join("data");
+
+    if !data_file.exists() {
+        fs::create_dir(&data_file)?;
+    }
 
     fs::write(data_file.join("engine"), format!("{}", cli.engine))?;
 
