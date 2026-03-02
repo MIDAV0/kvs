@@ -1,5 +1,5 @@
 use crossbeam::channel::{Receiver, Sender, unbounded};
-use std::{panic, thread::{self, JoinHandle}};
+use std::thread::{self, JoinHandle};
 
 use crate::{Result, KvsError};
 use super::{ThreadPool, Job};
@@ -18,7 +18,7 @@ impl Worker {
                 Ok(job) => {
                     job();
                 }
-                Err(e) => {
+                Err(_) => {
                     break;
                 }
             }
