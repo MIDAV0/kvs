@@ -1,4 +1,3 @@
 /target
 /data
-
-kvs-server.log
+/server-logs
