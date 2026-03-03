@@ -16,7 +16,9 @@ impl Worker {
         let thread = thread::spawn(move || loop {
             match receiver.recv() {
                 Ok(job) => {
-                    job();
+                    if let Err(e) = std::panic::catch_unwind(std::panic::AssertUnwindSafe(job)) {
+                        slog::error!(slog_scope::logger(), "Worker thread panicked while executing a job"; "worker_id" => id, "error" => format!("{:?}", e));
+                    }
                 }
                 Err(_) => {
                     break;
@@ -28,12 +30,12 @@ impl Worker {
     }
 }
 
-pub struct NaiveThreadPool {
+pub struct SharedQueueThreadPool {
     sender: Option<Sender<Job>>,
     workers: Vec<Worker>,
 }
 
-impl ThreadPool for NaiveThreadPool {
+impl ThreadPool for SharedQueueThreadPool {
     fn new(threads: u32) -> Result<Self> {
         if threads < 1 { return Err(KvsError::ThreadPool("minimum amount of threads is 1".to_string())); }
 
@@ -44,7 +46,7 @@ impl ThreadPool for NaiveThreadPool {
             .collect();
 
         Ok(
-            NaiveThreadPool { sender: Some(sender), workers }
+            SharedQueueThreadPool { sender: Some(sender), workers }
         )
     }
 
@@ -56,7 +58,7 @@ impl ThreadPool for NaiveThreadPool {
     }
 }
 
-impl Drop for NaiveThreadPool {
+impl Drop for SharedQueueThreadPool {
     fn drop(&mut self) {
         drop(self.sender.take());
         for worker in &mut self.workers {

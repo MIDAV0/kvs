@@ -4,7 +4,7 @@ use std::{
 use clap::Parser;
 use slog::{o, Drain, Logger};
 
-use kvs::{engine::{KvsEngine, kvs::KvStore, sled::SledKvsEngine}, error::Result, server::KvServer, thread_pool::{ThreadPool, NaiveThreadPool}};
+use kvs::{engine::{KvsEngine, kvs::KvStore, sled::SledKvsEngine}, error::Result, server::KvServer, thread_pool::{ThreadPool, SharedQueueThreadPool}};
 
 
 #[derive(Parser)]
@@ -78,7 +78,7 @@ fn run(cli: Cli) -> Result<()> {
     fs::write(data_file.join("engine"), format!("{}", cli.engine))?;
 
 
-    let pool = NaiveThreadPool::new(cli.threads)?;
+    let pool = SharedQueueThreadPool::new(cli.threads)?;
     slog::info!(slog_scope::logger(), "Started a thread pool"; "threads" => &cli.threads);
 
     match cli.engine.as_str() {

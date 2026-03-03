@@ -1,7 +1,7 @@
-pub mod naive_thread_pool;
+pub mod shared_queue_thread_pool;
 pub mod rayon_thread_pool;
 
-pub use naive_thread_pool::NaiveThreadPool;
+pub use shared_queue_thread_pool::SharedQueueThreadPool;
 pub use rayon_thread_pool::RayonThreadPool;
 
 use crate::Result;
