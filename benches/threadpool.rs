@@ -1,4 +1,4 @@
-use std::sync::{Arc, Barrier, atomic::{AtomicUsize, Ordering}};
+use std::sync::{Arc, atomic::{AtomicUsize, Ordering}};
 
 use criterion::{BenchmarkId, Criterion, criterion_group, criterion_main};
 use kvs::thread_pool::{RayonThreadPool, SharedQueueThreadPool, ThreadPool};
