@@ -1,6 +1,8 @@
 use serde::{de::DeserializeOwned, Deserialize, Serialize};
 use std::io::{self, Read, Write};
 use std::net::TcpStream;
+use tokio::io::{AsyncReadExt, AsyncWriteExt};
+use tokio::net::TcpStream as TokioTcpStream;
 
 use crate::error::Result;
 
@@ -29,7 +31,10 @@ pub enum RemoveResponse {
     Err(String),
 }
 
-pub fn send_message<T: Serialize>(stream: &mut TcpStream, msg: &T) -> Result<()> {
+pub fn send_message<T: Serialize>(
+    stream: &mut TcpStream,
+    msg: &T
+) -> Result<()> {
     // 1. Serialize the message to a buffer
     let data = bincode::serialize(msg)?;
 
@@ -45,7 +50,9 @@ pub fn send_message<T: Serialize>(stream: &mut TcpStream, msg: &T) -> Result<()>
     Ok(())
 }
 
-pub fn recv_message<T: DeserializeOwned>(stream: &mut TcpStream) -> Result<T> {
+pub fn recv_message<T: DeserializeOwned>(
+    stream: &mut TcpStream
+) -> Result<T> {
     // 1. Read the length prefix (4 bytes)
     let mut len_buf = [0u8; 4];
     
@@ -60,6 +67,50 @@ pub fn recv_message<T: DeserializeOwned>(stream: &mut TcpStream) -> Result<T> {
 
     // 3. Read the payload
     stream.read_exact(&mut buf)?;
+
+    // 4. Deserialize
+    let msg = bincode::deserialize(&buf)
+        .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, e))?;
+
+    Ok(msg)
+}
+
+pub async fn send_message_async<T: Serialize>(
+    stream: &mut TokioTcpStream,
+    msg: &T
+) -> Result<()> {
+    // 1. Serialize the message to a buffer
+    let data = bincode::serialize(msg)?;
+
+    // 2. Write the length prefix (u32, 4 bytes)
+    let len = data.len() as u32;
+    stream.write_all(&len.to_be_bytes()).await?;
+
+    // 3. Write the actual payload
+    stream.write_all(&data).await?;
+    
+    // Optional: flush to ensure it goes out immediately
+    stream.flush().await?; 
+    Ok(())
+}
+
+pub async fn recv_message_async<T: DeserializeOwned>(
+    stream: &mut TokioTcpStream
+) -> Result<T> {
+    // 1. Read the length prefix (4 bytes)
+    let mut len_buf = [0u8; 4];
+    
+    // read_exact is crucial: it blocks until exactly 4 bytes are read.
+    // If the stream closes early, it returns an Error (UnexpectedEof).
+    stream.read_exact(&mut len_buf).await?; 
+    
+    let len = u32::from_be_bytes(len_buf) as usize;
+
+    // 2. Allocate buffer of the exact expected size
+    let mut buf = vec![0u8; len];
+
+    // 3. Read the payload
+    stream.read_exact(&mut buf).await?;
 
     // 4. Deserialize
     let msg = bincode::deserialize(&buf)
